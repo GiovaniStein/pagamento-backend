@@ -1,5 +1,6 @@
 package com.example.pagamento_backend.infrastructure.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +18,8 @@ public class TransactionResponceDto {
     private String payeeCpf;
     private String payeeName;
     private BigDecimal valor;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+
+
     private LocalDateTime createdAt;
 }

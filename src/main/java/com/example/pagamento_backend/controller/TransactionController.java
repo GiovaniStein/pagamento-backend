@@ -5,6 +5,7 @@ import com.example.pagamento_backend.infrastructure.dtos.CreateTransactionDto;
 import com.example.pagamento_backend.infrastructure.dtos.TransactionResponceDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<TransactionResponceDto> createTransaction(@Valid @RequestBody CreateTransactionDto transaction) {
         TransactionResponceDto save = transactionService.create(transaction);
-        return ResponseEntity.ok(save);
+        return ResponseEntity.status(HttpStatus.CREATED).body(save);
     }
 
     @GetMapping

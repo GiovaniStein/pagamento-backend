@@ -5,7 +5,8 @@ import com.example.pagamento_backend.infrastructure.exceptions.AuthorizationExce
 import com.example.pagamento_backend.infrastructure.entities.Transaction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -15,22 +16,24 @@ public class AuthorizationService {
 
     @Value("${service.authorization.url}")
     private String urlAuthorize;
+    private final RestClient restClient;
 
     public void authorize(Transaction transaction) {
 
-        RestClient restClient = RestClient.builder().baseUrl(urlAuthorize).build();
-
-        AuthorizationResponceDto body = restClient
-                .get()
+        ResponseEntity<AuthorizationResponceDto> request = restClient
+                .method(HttpMethod.GET)
+                .uri(urlAuthorize)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new AuthorizationException("Ocorreu um erro no preocesso de autorização");
-                })
-                .toEntity(AuthorizationResponceDto.class).getBody();
+                .toEntity(AuthorizationResponceDto.class);
 
-        if(!body.getData().isAuthorization()) {
+        if (!request.getStatusCode().is2xxSuccessful()) {
+            throw new AuthorizationException("Ocorreu um erro no preocesso de autorização");
+        }
+
+        if (request.getStatusCode().is2xxSuccessful() && !request.getBody().getData().isAuthorization()) {
             throw new AuthorizationException("Operação não foi autorizada");
         }
+
     }
 
 }
